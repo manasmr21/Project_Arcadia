@@ -53,3 +53,6 @@ ehthumbs.db
 *.tmp
 .turbo/
 .cache/
+
+#image files
+Docs

@@ -1,22 +1,31 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
 import { useSharedValue, SharedValue } from "react-native-reanimated";
 
 type HeaderContextType = {
   headerTranslateY: SharedValue<number>;
   headerHeight: SharedValue<number>;
+  headerName: string
+  setHeaderName: Dispatch<SetStateAction<string>>
+  back: boolean,
+  setBack: Dispatch<SetStateAction<boolean>>
 };
 
 const HeaderContext = createContext<HeaderContextType | undefined>(undefined);
 
 export const HeaderProvider = ({ children }: { children: React.ReactNode }) => {
+  const [headerName, setHeaderName] = useState("Arcadia");
+  const [back, setBack] = useState(false);
   const headerTranslateY = useSharedValue(0);
   const headerHeight = useSharedValue(0);
-
   return (
     <HeaderContext.Provider
       value={{
         headerTranslateY,
         headerHeight,
+        headerName,
+        setHeaderName,
+        back,
+        setBack
       }}
     >
       {children}
