@@ -9,7 +9,7 @@ import {
 import { moderateScale } from '@/constants/metrics/metrics';
 import { UIColors } from '@/constants/theme';
 
-export const CARD_BORDER_RADIUS = 10;
+export const CARD_BORDER_RADIUS = 5;
 export const CARD_BORDER_WIDTH = 2;
 export const CARD_SHADOW_OFFSET = 4;
 export const CARD_PADDING = moderateScale(12, 0.5);

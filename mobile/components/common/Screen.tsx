@@ -3,6 +3,8 @@ import React from 'react'
 import { horizontalScale } from '@/constants/metrics/metrics'
 import { UIColors } from '@/constants/theme'
 
+export const screenHorizontalPadding = horizontalScale(20)
+
 const Screen = ({style, children, ...props} : ViewProps) => {
   return (
     <View
@@ -19,7 +21,7 @@ export default Screen
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        paddingHorizontal: horizontalScale(20),
+        paddingHorizontal: screenHorizontalPadding,
         backgroundColor: UIColors.background,
     }
 })

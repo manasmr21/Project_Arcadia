@@ -1,17 +1,52 @@
-import { Platform, StyleSheet, View, Text, Pressable } from 'react-native';
-import { UIColors } from '@/constants/theme';
-import { horizontalScale, moderateScale, verticalScale } from '@/constants/metrics/metrics';
-import Card from '@/components/ui/Cards';
-
+import { StyleSheet, View, Text, Pressable, ScrollView } from "react-native";
+import { UIColors } from "@/constants/theme";
+import { moderateScale, verticalScale } from "@/constants/metrics/metrics";
+import Card from "@/components/ui/Cards";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { useHeaderContext } from "@/components/common/Header/HeaderContext";
+import { router } from "expo-router";
 
 export default function HomeScreen() {
+  const { headerTranslateY, headerHeight } = useHeaderContext();
+
+  const prevScrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const currentY = event.contentOffset.y;
+      const diff = currentY - prevScrollY.value;
+
+      if (currentY <= 0) {
+        headerTranslateY.value = withTiming(0);
+      } else {
+        headerTranslateY.value = Math.min(
+          0,
+          Math.max(-headerHeight.value, headerTranslateY.value - diff),
+        );
+      }
+
+      prevScrollY.value = currentY;
+    },
+  });
+
   return (
-    <View style={styles.container}>
+    <Animated.ScrollView
+      onScroll={scrollHandler}
+      scrollEventThrottle={16}
+      style={[styles.container, {paddingTop: headerHeight}]}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.heroBlock}>
         <Text style={styles.title}>Ready for some fun?</Text>
       </View>
 
-      <Text style={styles.subText}>Gather your friends and let&apos;s play.</Text>
+      <Text style={styles.subText}>
+        Gather your friends and let&apos;s play.
+      </Text>
 
       <Pressable style={styles.primaryActionWrap}>
         <Card style={styles.quickPlayButton}>
@@ -22,7 +57,9 @@ export default function HomeScreen() {
 
             <View style={styles.quickPlayTextWrap}>
               <Text style={styles.quickPlayTitle}>Quick play</Text>
-              <Text style={styles.quickPlayCaption}>Jump into a random game</Text>
+              <Text style={styles.quickPlayCaption}>
+                Jump into a random game
+              </Text>
             </View>
 
             <Text style={styles.arrow}>›</Text>
@@ -33,37 +70,47 @@ export default function HomeScreen() {
       <Text style={styles.sectionLabel}>EXPLORE</Text>
 
       <View style={styles.grid}>
-        <Pressable style={styles.gridItemHalf}>
+        <Pressable style={[styles.gridItemHalf]}
+          onPress={()=> router.push("/games")}
+        >
           <Card style={styles.cardYellow}>
             <View style={styles.tileRow}>
-              <View style={styles.tileIconBox}><Text style={styles.tileIcon}>🎲</Text></View>
+              <View style={styles.tileIconBox}>
+                <Text style={styles.tileIcon}>🎲</Text>
+              </View>
               <Text style={styles.tileText}>Browse games</Text>
             </View>
           </Card>
         </Pressable>
 
-        <Pressable style={styles.gridItemHalf}>
+        <Pressable style={[styles.gridItemHalf]}>
           <Card style={styles.cardCoral}>
             <View style={styles.tileRow}>
-              <View style={styles.tileIconBox}><Text style={styles.tileIcon}>◉</Text></View>
+              <View style={styles.tileIconBox}>
+                <Text style={styles.tileIcon}>◉</Text>
+              </View>
               <Text style={styles.tileText}>Party picker</Text>
             </View>
           </Card>
         </Pressable>
 
-        <Pressable style={styles.gridItemHalf}>
+        <Pressable style={[styles.gridItemHalf]}>
           <Card style={styles.cardTeal}>
             <View style={styles.tileRow}>
-              <View style={styles.tileIconBox}><Text style={styles.tileIcon}>▣</Text></View>
+              <View style={styles.tileIconBox}>
+                <Text style={styles.tileIcon}>▣</Text>
+              </View>
               <Text style={styles.tileText}>Custom packs</Text>
             </View>
           </Card>
         </Pressable>
 
-        <Pressable style={styles.gridItemHalf}>
+        <Pressable style={[styles.gridItemHalf]}>
           <Card style={styles.cardCream}>
             <View style={styles.tileRow}>
-              <View style={styles.tileIconBox}><Text style={styles.tileIcon}>⚙</Text></View>
+              <View style={styles.tileIconBox}>
+                <Text style={styles.tileIcon}>⚙</Text>
+              </View>
               <Text style={styles.tileText}>Settings</Text>
             </View>
           </Card>
@@ -72,26 +119,28 @@ export default function HomeScreen() {
 
       <Text style={styles.sectionLabel}>RECENT SESSION</Text>
 
-      <Pressable>
-        <Card style={styles.sessionCard}>
-          <View style={styles.sessionRow}>
-            <View style={styles.sessionDot} />
-            <View style={styles.sessionTextWrap}>
-              <Text style={styles.sessionTitle}>Truth or dare</Text>
-              <Text style={styles.sessionMeta}>12 min ago</Text>
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, idx) => (
+        <Pressable key={idx} style={{ marginBottom: 12 }}>
+          <Card style={styles.sessionCard}>
+            <View style={styles.sessionRow}>
+              <View style={styles.sessionDot} />
+              <View style={styles.sessionTextWrap}>
+                <Text style={styles.sessionTitle}>Truth or dare</Text>
+                <Text style={styles.sessionMeta}>12 min ago</Text>
+              </View>
+              <Text style={styles.arrow}>›</Text>
             </View>
-            <Text style={styles.arrow}>›</Text>
-          </View>
-        </Card>
-      </Pressable>
-    </View>
+          </Card>
+        </Pressable>
+      ))}
+    </Animated.ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     paddingHorizontal: moderateScale(5, 0.5),
     paddingBottom: verticalScale(10),
     backgroundColor: UIColors.background,
@@ -103,15 +152,15 @@ const styles = StyleSheet.create({
   title: {
     color: UIColors.text,
     fontSize: moderateScale(30, 0.5),
-    fontFamily: 'Fredoka_500Medium',
+    fontFamily: "Fredoka_500Medium",
     lineHeight: moderateScale(36, 0.5),
     paddingBottom: moderateScale(4, 0.5),
-    textAlign: 'left',
+    textAlign: "left",
   },
   subText: {
     color: UIColors.muted,
     fontSize: moderateScale(14, 0.5),
-    fontFamily: 'Fredoka_400Regular',
+    fontFamily: "Fredoka_400Regular",
     marginBottom: 14,
   },
   primaryActionWrap: {
@@ -123,16 +172,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   quickPlayRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconBadge: {
     width: 38,
     height: 38,
     borderRadius: 12,
     backgroundColor: UIColors.purpleSoft,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
     borderColor: UIColors.border,
     marginRight: 12,
@@ -145,75 +194,81 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   quickPlayTitle: {
-    color: '#fffdf8',
+    color: "#fffdf8",
     fontSize: moderateScale(18, 0.5),
-    fontFamily: 'Fredoka_500Medium',
+    fontFamily: "Fredoka_500Medium",
     marginBottom: 2,
   },
   quickPlayCaption: {
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
     fontSize: moderateScale(12, 0.5),
-    fontFamily: 'Fredoka_400Regular',
+    fontFamily: "Fredoka_400Regular",
   },
   arrow: {
     color: UIColors.white,
     fontSize: 30,
-    fontFamily: 'Fredoka_500Medium',
+    fontFamily: "Fredoka_500Medium",
     lineHeight: 30,
     marginLeft: 8,
   },
   sectionLabel: {
     color: UIColors.text,
     fontSize: moderateScale(12, 0.5),
-    fontFamily: 'Fredoka_700Bold',
+    fontFamily: "Fredoka_700Bold",
     letterSpacing: 1.2,
     marginTop: 8,
     marginBottom: 12,
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     marginBottom: 18,
   },
   gridItemHalf: {
-    width: '48%',
+    width: "48%",
     marginBottom: 12,
   },
+  // tiltLeft: {
+  //   transform: [{ rotate: "-1.5deg" }],
+  // },
+  // tiltRight: {
+  //   transform: [{ rotate: "1.5deg" }],
+  // },
   cardYellow: {
     backgroundColor: UIColors.yellow,
     minHeight: 90,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   cardCoral: {
     backgroundColor: UIColors.coral,
     minHeight: 90,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   cardTeal: {
     backgroundColor: UIColors.teal,
     minHeight: 90,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   cardCream: {
     backgroundColor: UIColors.cream,
     minHeight: 90,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   tileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
   },
   tileIconBox: {
     width: 30,
     height: 30,
     borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: "rgba(255,255,255,0.18)",
     borderWidth: 2,
     borderColor: UIColors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   tileIcon: {
     fontSize: 16,
@@ -222,7 +277,7 @@ const styles = StyleSheet.create({
   tileText: {
     color: UIColors.text,
     fontSize: moderateScale(18, 0.5),
-    fontFamily: 'Fredoka_500Medium',
+    fontFamily: "Fredoka_500Medium",
     flexShrink: 1,
   },
   sessionCard: {
@@ -231,8 +286,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   sessionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   sessionDot: {
     width: 28,
@@ -247,12 +302,12 @@ const styles = StyleSheet.create({
   sessionTitle: {
     color: UIColors.text,
     fontSize: moderateScale(18, 0.5),
-    fontFamily: 'Fredoka_500Medium',
+    fontFamily: "Fredoka_500Medium",
   },
   sessionMeta: {
     color: UIColors.muted,
     fontSize: moderateScale(12, 0.5),
-    fontFamily: 'Fredoka_400Regular',
+    fontFamily: "Fredoka_400Regular",
     marginTop: 2,
   },
 });

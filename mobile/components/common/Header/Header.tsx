@@ -2,28 +2,53 @@ import { View, Text, StyleSheet } from "react-native";
 import { horizontalScale, moderateScale, verticalScale } from "@/constants/metrics/metrics";
 import React from "react";
 import { UIColors } from "@/constants/theme";
+import { screenHorizontalPadding } from "@/components/common/Screen";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import {useHeaderContext} from "./HeaderContext";
 
 const Header = () => {
+
+  const { headerTranslateY, headerHeight } = useHeaderContext();
+
+  const animatedStyle = useAnimatedStyle(()=>{
+    return {
+      transform: [{ translateY: headerTranslateY.value }],
+    }
+  })
+
   return (
-    <SafeAreaView style={styles.header}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Arcadia</Text>
-      </View>
-    </SafeAreaView>
+   <Animated.View style={[styles.wrapper, animatedStyle]}
+    onLayout={(e) => {
+      const height = e.nativeEvent.layout.height;
+      headerHeight.value = height;
+    }}
+   >
+      <SafeAreaView style={styles.header}>
+        <View>
+          <Text style={styles.title}>Arcadia</Text>
+        </View>
+      </SafeAreaView>
+    </Animated.View>
   );
 };
 
 export default Header;
 
 const styles = StyleSheet.create({
+  wrapper:{
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    elevation: 10,
+    paddingHorizontal: screenHorizontalPadding,
+  },
   header: {
     backgroundColor: UIColors.background,
     paddingTop: verticalScale(10),
-  },
-  container: {
-    paddingHorizontal: horizontalScale(5),
-    paddingBottom: verticalScale(12),
+    paddingHorizontal: horizontalScale(5)
   },
   title: {
     fontSize: moderateScale(25, 0.5),
