@@ -1,25 +1,44 @@
-import { StyleSheet, View, Text, Pressable } from 'react-native';
-import React from 'react';
+import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import React, { useCallback } from 'react';
 import Card from '@/components/ui/Cards';
-import { moderateScale, verticalScale } from '@/constants/metrics/metrics';
+import { horizontalScale, moderateScale, verticalScale } from '@/constants/metrics/metrics';
 import { UIColors } from '@/constants/theme';
 import { useHeaderContext } from '@/components/common/Header/HeaderContext';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { Href, router, useFocusEffect } from 'expo-router';
 
-const games = [
-  { title: 'Truth or Dare', emoji: '🎲', color: UIColors.yellow },
-  { title: 'Party Mix', emoji: '🎉', color: UIColors.coral },
-  { title: 'Classic Duo', emoji: '♟️', color: UIColors.teal },
-  { title: 'Quick Fire', emoji: '⚡', color: UIColors.cream },
-  { title: 'Brain Brawl', emoji: '🧠', color: UIColors.purpleSoft },
-  { title: 'Chill Mode', emoji: '🌙', color: '#d7e7ff' },
+type Game = {
+  title: string
+  color: string
+  route: Href
+
+}
+
+const games : Game[] = [
+  { title: 'Truth or Dare', color: UIColors.yellow, route:"/games/truthOrDare" },
+  { title: 'Would you rather', color: UIColors.coral, route:"/" },
+  { title: 'Who most likely to', color: UIColors.teal, route:"/" },
+  { title: 'Never have I ever', color: UIColors.cream, route:"/" },
+  { title: 'Dare roulette', color: UIColors.purpleSoft, route:"/" },
+  { title: 'Rapid Truth', color: '#d7e7ff', route:"/" },
 ];
 
 const Games = () => {
-  const { headerHeight } = useHeaderContext();
+  const { setHeaderName, setBack } = useHeaderContext();
+
+  const configHeader = useCallback(() => {
+    setHeaderName('Games');
+    setBack(true);
+  }, [setHeaderName, setBack]);
+
+  useFocusEffect(
+    useCallback(() => {
+      configHeader();
+    }, [configHeader]),
+  );
 
   return (
-    <View style={[styles.screen]}>
-      <Text style={styles.heading}>Games</Text>
+    <ScrollView style={[styles.screen]}>
       <Text style={styles.subheading}>Pick a vibe and jump in</Text>
 
       <View style={styles.grid}>
@@ -27,19 +46,21 @@ const Games = () => {
           <Pressable
             key={game.title}
             style={styles.cardWrap}
+            onPress={()=>router.navigate(game.route)}
           >
             <Card style={[styles.card, { backgroundColor: game.color }]}>
               <View style={styles.tileRow}>
-                <View style={styles.iconBox}>
-                  <Text style={styles.icon}>{game.emoji}</Text>
-                </View>
+                {/* <View style={styles.iconBox}>
+                  <Text style={styles.icon}>{gamxt>
+                </View> */}
                 <Text style={styles.title}>{game.title}</Text>
+                <FontAwesome5 name="greater-than" size={24} color="black" />
               </View>
             </Card>
           </Pressable>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -66,22 +87,22 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
+    gap: 15,
+    width: "100%"
   },
   cardWrap: {
-    width: '48%',
+    width: '100%'
   },
   card: {
-    minHeight: 110,
+    minHeight: moderateScale(80, 0.5),
     justifyContent: 'center',
     overflow: 'hidden',
   },
   tileRow: {
+    padding: moderateScale(5),
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: 10,
   },
   iconBox: {

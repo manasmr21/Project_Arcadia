@@ -8,10 +8,22 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useHeaderContext } from "@/components/common/Header/HeaderContext";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
 export default function HomeScreen() {
-  const { headerTranslateY, headerHeight } = useHeaderContext();
+  const { headerTranslateY, headerHeight, setHeaderName, setBack } = useHeaderContext();
+
+  const setHeaderConfig = useCallback(() => {
+    setHeaderName("Arcadia");
+    setBack(false);
+  }, [setHeaderName, setBack]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setHeaderConfig();
+    }, [setHeaderConfig]),
+  );
 
   const prevScrollY = useSharedValue(0);
 
@@ -37,7 +49,7 @@ export default function HomeScreen() {
     <Animated.ScrollView
       onScroll={scrollHandler}
       scrollEventThrottle={16}
-      style={[styles.container, {paddingTop: headerHeight}]}
+      style={[styles.container]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.heroBlock}>
@@ -71,7 +83,7 @@ export default function HomeScreen() {
 
       <View style={styles.grid}>
         <Pressable style={[styles.gridItemHalf]}
-          onPress={()=> router.push("/games")}
+          onPress={()=> router.navigate("/games")}
         >
           <Card style={styles.cardYellow}>
             <View style={styles.tileRow}>

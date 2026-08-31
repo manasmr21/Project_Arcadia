@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { horizontalScale, moderateScale, verticalScale } from "@/constants/metrics/metrics";
 import React from "react";
 import { UIColors } from "@/constants/theme";
@@ -6,10 +6,13 @@ import { screenHorizontalPadding } from "@/components/common/Screen";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import {useHeaderContext} from "./HeaderContext";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { router, Router } from "expo-router";
 
 const Header = () => {
 
-  const { headerTranslateY, headerHeight } = useHeaderContext();
+
+  const { headerTranslateY, headerHeight, headerName, back } = useHeaderContext();
 
   const animatedStyle = useAnimatedStyle(()=>{
     return {
@@ -25,8 +28,15 @@ const Header = () => {
     }}
    >
       <SafeAreaView style={styles.header}>
-        <View>
-          <Text style={styles.title}>Arcadia</Text>
+        <View style={styles.config}>
+          {back && 
+            <Pressable
+              onPress={()=> router.back()}
+            >
+              <FontAwesome5 name="arrow-left" size={20} color="black" />
+            </Pressable>
+          }
+          <Text style={styles.title}>{headerName}</Text>
         </View>
       </SafeAreaView>
     </Animated.View>
@@ -71,4 +81,11 @@ const styles = StyleSheet.create({
     textAlign: "left",
     opacity: 0.8,
   },
+  config:{
+    display: "flex",
+    flexDirection: "row",
+    // justifyContent: "center",
+    gap: moderateScale(12),
+    alignItems: "center"
+  }
 });
